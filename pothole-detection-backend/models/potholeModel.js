@@ -5,10 +5,11 @@ const potholeSchema = new mongoose.Schema({
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true },
   },
-  image: { type: String, required: true }, // Store image URL or path
+  image: { type: String, required: true },
   status: { type: String, default: 'reported' },
   reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   tweeted: { type: Boolean, default: false },
+  confidence: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 
