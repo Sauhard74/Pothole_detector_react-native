@@ -10,27 +10,22 @@ exports.reportPothole = async (req, res) => {
 
     // Validate image with AI model
     try {
-      // Convert image to base64
       const imageBase64 = fs.readFileSync(image, { encoding: 'base64' });
-
-      // Call AI model API
       const aiResponse = await axios.post(process.env.AI_MODEL_URL, {
         image: imageBase64,
       }, {
         headers: {
           'Content-Type': 'application/json',
         },
-        timeout: 30000 // 30 seconds timeout
+        timeout: 30000
       });
 
       console.log('AI Model Response:', aiResponse.data);
 
-      // Check if the image is a pothole based on the exact response format
       const isPothole = aiResponse.data.result === "Pothole";
       const confidence = parseFloat(aiResponse.data.confidence.replace('%', ''));
 
-      if (!isPothole || confidence < 50) { // You can adjust the confidence threshold
-        // Clean up - delete the uploaded file
+      if (!isPothole || confidence < 50) {
         fs.unlinkSync(image);
         return res.status(400).json({ 
           message: 'Image is not identified as a pothole',
@@ -39,14 +34,12 @@ exports.reportPothole = async (req, res) => {
         });
       }
 
-      // If it is a pothole, save to database
       const pothole = new Pothole({
         location: { latitude, longitude },
         image,
         reportedBy: userId,
         confidence: aiResponse.data.confidence
       });
-
       await pothole.save();
 
       // Optional: Post to Twitter
@@ -58,7 +51,6 @@ exports.reportPothole = async (req, res) => {
           access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
         });
 
-        // Post tweet with image
         const tweet = await twitterClient.post('statuses/update', {
           status: `Pothole reported at Lat: ${latitude}, Long: ${longitude} (Confidence: ${aiResponse.data.confidence})`
         });
@@ -80,7 +72,6 @@ exports.reportPothole = async (req, res) => {
 
     } catch (aiError) {
       console.error('AI Model Error:', aiError);
-      // Clean up on error
       fs.unlinkSync(image);
       return res.status(500).json({ 
         message: 'Failed to validate image with AI model',
@@ -89,7 +80,6 @@ exports.reportPothole = async (req, res) => {
     }
   } catch (error) {
     console.error('Report Pothole Error:', error);
-    // Clean up on error
     if (req.file && req.file.path) {
       fs.unlinkSync(req.file.path);
     }

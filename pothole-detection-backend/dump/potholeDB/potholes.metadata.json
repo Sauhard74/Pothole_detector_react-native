@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"e5a1df0ca5ad4a8984ea0168cfd8f568","collectionName":"potholes","type":"collection"}
