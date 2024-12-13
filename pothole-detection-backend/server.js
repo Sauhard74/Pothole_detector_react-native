@@ -37,7 +37,7 @@ app.use(
     saveUninitialized: true,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI, // Use your MongoDB connection string
+      mongoUrl: process.env.MONGODB_URI, // Use your MongoDB connection string
       ttl: 14 * 24 * 60 * 60, // = 14 days. Default
     }),
 })
