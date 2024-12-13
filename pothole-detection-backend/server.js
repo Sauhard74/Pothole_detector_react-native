@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const potholeRoutes = require('./routes/potholeRoutes');
 const authRoutes = require('./routes/authRoutes');
+const MongoStore = require('connect-mongo');
 
 // Load environment variables
 dotenv.config();
@@ -34,11 +35,12 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
-  })
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI, // Use your MongoDB connection string
+      ttl: 14 * 24 * 60 * 60, // = 14 days. Default
+    }),
+})
 );
 
 // Initialize Passport
